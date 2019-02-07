@@ -1,6 +1,6 @@
 # Assigment 3
 
-Progetto per Torsello Parte 3
+Project for ALG 2 (Torsello) Part 3/3.
 
 ## Getting Started
 
@@ -8,11 +8,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-G++ 4.8.5 with OpenMP available on the machine.
+G++ 4.8.5 with OpenMP available on the machine. 
+Linux OS Preferred.
 
 ### Installing
 
 Run "compile.sh" to create all four examples.
+Run "es4" for latest tests.
 
 ## Authors
 
@@ -22,12 +24,12 @@ Run "compile.sh" to create all four examples.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GPL 3.0 License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
 * Hat tip to anyone whose code was used
 * Inspiration
-* 30 and LODE
+* Expected 30 and LODE
 
 
