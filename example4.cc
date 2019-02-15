@@ -163,6 +163,6 @@ for (int i=0; i!=m; ++i) {
 std::cout << std::endl;
 etime = omp_get_wtime() - etime;
 std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
-
+std::getchar();
 return 0;
 }

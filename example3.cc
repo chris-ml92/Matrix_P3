@@ -3,7 +3,7 @@
 #include"matrix.h"
 #include"matrix_wrap.h"
 
-
+/*
 int main() {
 
 matrix<int,4,5> A;
@@ -46,8 +46,8 @@ for (int i=0; i!=3; ++i) {
 		std::cout << D(i,j) << ' ';
 	std::cout << '\n';
 }
-std::cout /*<< D.get<1,2>() << ' '*/ << decltype(D)::H <<',' << decltype(D)::W  << '\n';
-std::cout << std::endl;
+std::cout /*<< D.get<1,2>() << ' ' << decltype(D)::H <<',' << decltype(D)::W  << '\n';
+/*d::cout << std::endl;
 
 matrix<int,4,1> V;
 for (int i=0; i!=4; ++i) V(i,0) = i+1;
@@ -66,3 +66,4 @@ std::cout << std::endl;
 
 return 0;
 }
+*/

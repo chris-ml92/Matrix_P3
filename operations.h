@@ -78,6 +78,74 @@ operator + (matrix<T,H,W>&& left, const matrix_ref<U,RType>& right) {
 
 template<typename T,unsigned h, unsigned w>
 class matrix_product {
+	private:
+	matrix<T> singleMultiplication(matrix<T>& a, matrix<T>& b) {
+		int r1 = a.get_height();
+		int r2 = b.get_height();
+		int c1 = a.get_width();
+		int c2 = b.get_width();
+
+		///////////////////////////////////////////////////////
+		assert(c1 == r2);
+		///////////////////////////////////////////////////////
+
+		matrix<T> m(r1, c2);
+		for (int i = 0; i < r1; ++i)
+			for (int j = 0; j < c2; ++j)
+				for (int k = 0; k < c1; ++k)
+				{
+					m(i, j) = m(i, j) + a(i, k) * b(k, j);
+				}
+		return m;
+	}
+	matrix<T> multiplySubSequence(std::vector<matrix_wrap<T>> A, std::vector<std::vector<int>> s, int i, int j) {
+		if (i == j) {
+			return A[i]; //uses matrix_wrap operator conversion to matrix
+		}
+		int k = s[i][j];
+		matrix<T> X = multiplySubSequence(A, s, i, k);
+		matrix<T> Y = multiplySubSequence(A, s, k + 1, j);
+		return singleMultiplication(X, Y);
+	}
+
+	std::vector<int> extractDims(std::vector<matrix_wrap<T>> list) {
+		int n = list.size();
+		std::vector<int> res;
+		res.resize(n + 1, 0);
+		res[0] = list[0].get_height();
+		for (int i = 1; i < n; i++) {
+			res[i] = list[i].get_height();
+		}
+		res[n] = list[n - 1].get_width();
+		return res;
+	}
+
+	matrix<T> resolveChain(std::vector<matrix_wrap<T>> list) {
+		unsigned h = list.front().get_height();
+		unsigned w = list.back().get_width();
+		matrix<T> result(h, w);
+		unsigned n = list.size();
+		std::vector<std::vector<int>> m, s;
+		std::vector<int> p;
+		m.resize(n, std::vector<int>(n, 0));
+		s.resize(n, std::vector<int>(n, 0));
+		p = extractDims(list);
+		for (unsigned L = 2; L < n; L++) {
+			for (unsigned i = 1; i < n - L + 1; i++) {
+				unsigned j = i + L - 1;
+				m[i][j] = std::numeric_limits<int>::max();
+				for (unsigned k = i; k <= j - 1; k++) {
+					unsigned q = m[i][k] + m[k + 1][j] + p[i - 1 + 1] * p[k] * p[j];
+					if (q < m[i][j]) {
+						m[i][j] = q;
+						s[i][j] = k;
+					}
+				}
+			}
+		}
+		return multiplySubSequence(list, s, 0, n - 1);
+	}
+
 	public:
 	
 	static constexpr unsigned H=h;
@@ -86,65 +154,13 @@ class matrix_product {
 
 	// Added OpenMP
 	operator matrix<T>() {
-		resolve();
-		matrix_wrap<T> lhs=matrices.front(), rhs=matrices.back();
-		const unsigned height = lhs.get_height();
-		const unsigned width = rhs.get_width();
-		const unsigned span = lhs.get_width();
-		assert(span==rhs.get_height());
-		matrix<T> result(height, width);
-		
-		// Threads starting point
-		#pragma omp parallel 
-		{
-			unsigned i, j, k; // Private for threads, no race conditions
-			
-			// Compute for in parallel
-			#pragma omp for
-			for(i=0; i<height; ++i) {
-				for(j=0; j<width; ++j) {
-					result(i,j)=0; // Moving this out will reduce performance 
-					for(k=0; k<span; ++k) {
-						result(i,j) += lhs(i,k)*rhs(k,j);
-					}
-				}
-			}
-		}
-				
-		std::cerr << "product conversion\n";
-		return result;				
+		return resolveChain(matrices);
 	}
 	
 	// Added OpenMP
 	template<unsigned h2, unsigned w2>
 	operator matrix<T,h2,w2>() {
-		static_assert((h==0 || h==h2) && (w==0 || w==w2), "sized product conversion to wrong sized matrix");
-		assert(h2==get_height() && w2==get_width());
-		resolve();
-		matrix_wrap<T> lhs=matrices.front(), rhs=matrices.back();
-		const unsigned span = lhs.get_width();
-		assert(span==rhs.get_height());
-		matrix<T,h2,w2> result;
-		
-		// Threads starting point
-		#pragma omp parallel 
-		{
-			unsigned i, j, k; // Private for threads, no race conditions
-			
-			// Compute for in parallel
-			#pragma omp for
-			for(i=0; i<h2; ++i) {
-				for(j=0; j<w2; ++j) {
-					result(i,j)=0; // Moving this out will reduce performance 
-					for(k=0; k<span; ++k) {
-						result(i,j) += lhs(i,k)*rhs(k,j);
-					}
-				}
-			}
-		}
-		
-		std::cerr << "sized product conversion\n";
-		return result;				
+		return resolveChain(matrices);
 	}
 	
 	unsigned get_height() const { return matrices.front().get_height(); }
@@ -176,60 +192,7 @@ class matrix_product {
 	}
 	
 	// Modify RESOLVE to perform asyncronously
-	void resolve() { while(matrices.size()>2) resolve_one(); }
-	void resolve_one() {
-		typename std::list<matrix_wrap<T>>::iterator lhs = find_max();
-		typename std::list<matrix_wrap<T>>::iterator rhs = lhs;
-		++rhs;
-		typename std::list<matrix_wrap<T>>::iterator result=matrices.emplace(lhs,matrix<T>(lhs->get_height(),rhs->get_width()));
-		do_multiply(*result,*lhs,*rhs);
-		matrices.erase(lhs);
-		matrices.erase(rhs);
-	}
-	
-	typename std::list<matrix_wrap<T>>::iterator find_max() {
-		typename std::list<matrix_wrap<T>>::iterator mat_iter=matrices.begin();
-		typename std::list<matrix_wrap<T>>::iterator mat_max=mat_iter;
-		std::vector<unsigned>::iterator size_iter=sizes.begin();
-		std::vector<unsigned>::iterator last=--(sizes.end());
-		unsigned size_max=*size_iter;
-		while (size_iter!=last) {
-			if(*size_iter > size_max) {
-				size_max = *size_iter;
-				mat_max = mat_iter;
-			}
-			++mat_iter;
-			++size_iter;
-		}
-		return mat_max;
-	}
-	
-	// Added OpenMP 
-	void do_multiply(matrix_wrap<T> result, matrix_wrap<T> lhs, matrix_wrap<T> rhs) {
-		const unsigned height = result.get_height();
-		const unsigned width = result.get_width();
-		const unsigned span = lhs.get_width();
-		assert(span==rhs.get_height());
-		
-		// Threads starting point
-		#pragma omp parallel 
-		{
-			unsigned i, j, k; // Private for threads, no race conditions
-			
-			// Compute for in parallel
-			#pragma omp for
-			for(i=0; i<height; ++i) {
-				for(j=0; j<width; ++j) {
-					result(i,j)=0; // Moving this out will reduce performance 
-					for(k=0; k<span; ++k) {
-						result(i,j) += lhs(i,k)*rhs(k,j);
-					}
-				}
-			}
-		}	
-	}
-	
-	std::list<matrix_wrap<T>> matrices;
+	std::vector<matrix_wrap<T>> matrices;
 	std::vector<unsigned> sizes;
 };	
 	
