@@ -532,22 +532,25 @@ class matrix<T> : public matrix_ref<T,Plain> {
 		std::cerr << "matrix constructor\n";
 	}
 	
-	matrix(const matrix<T>& X) {
+	/*matrix(const matrix<T>& X) {
 		height = X.height;
 		width = X.width;
 		data = std::make_shared<std::vector<T>>(width*height);
 		*data = *(X.data);
 		
 		std::cerr << "matrix copy constructor\n";
-	}
+	}*/
 	
-	/*matrix(matrix<T>&& X) {
+	matrix(matrix<T>&& X) {
 		height = X.height;
 		width = X.width;
 		data = std::move(X.data);
 		
 		std::cerr << "matrix move constructor\n";
-	}*/
+	}
+
+	matrix(const matrix<T>& X) = default;
+	matrix& operator=(const matrix& X) = default;
 	
 	template<class matrix_type>
 	matrix(const matrix_ref<T,matrix_type>&X) {
