@@ -44,7 +44,7 @@ operator + (matrix<T>&& left, const matrix_ref<U,RType>& right) {
 	
 	return std::move(left);
 }
-
+template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T,LType>::H*matrix_ref<U,RType>::H!=0, matrix<typename op_traits<T,U>::sum_type, matrix_ref<T,LType>::H, matrix_ref<T,LType>::W>> 
 operator + (const matrix_ref<T,LType>& left, const matrix_ref<U,RType>& right) {
 	static_assert(matrix_ref<T,LType>::H==matrix_ref<U,RType>::H && matrix_ref<T,LType>::W==matrix_ref<U,RType>::W, 
