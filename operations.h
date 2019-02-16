@@ -73,7 +73,45 @@ operator + (matrix<T,H,W>&& left, const matrix_ref<U,RType>& right) {
 	return std::move(left);
 }
 
+// Somma
+template<typename T,unsigned h, unsigned w>
+class matrix_sum {
+	public:
+	
+	static constexpr unsigned H=h;
+	static constexpr unsigned W=w;
 
+	// Base
+	operator matrix<T>() {
+		return addMatrices(matrices);
+	}
+	
+	// Templated sizes
+	template<unsigned h2, unsigned w2>
+	operator matrix<T,h2,w2>() {
+		return addMatrices(matrices);
+	}
+	
+	// Dimensioni delle matrici, sono tutte uguali
+	unsigned get_height() const { return matrices.front().get_height(); }
+	unsigned get_width() const { return matrices.front().get_width(); }
+	
+	matrix_sum(matrix_sum<T,h,w>&& X) = default;
+	
+	private:
+	matrix_sum() = default; 
+	
+	template<unsigned w2>
+	matrix_sum(matrix_sum<T,h,w2>&& X) : matrices(std::move(X.matrices)) {}
+	
+	template<class matrix_type>
+	void add(matrix_ref<T,matrix_type> mat) {
+		matrices.emplace_back(mat);
+	}
+	
+	// Elenco matrici da sommare
+	std::vector<matrix_wrap<T>> matrices;
+};
 
 
 template<typename T,unsigned h, unsigned w>
@@ -161,13 +199,10 @@ class matrix_product {
 	static constexpr unsigned H=h;
 	static constexpr unsigned W=w;
 
-
-	// Added OpenMP
 	operator matrix<T>() {
 		return resolveChain(matrices);
 	}
 	
-	// Added OpenMP
 	template<unsigned h2, unsigned w2>
 	operator matrix<T,h2,w2>() {
 		return resolveChain(matrices);
@@ -176,7 +211,6 @@ class matrix_product {
 	unsigned get_height() const { return matrices.front().get_height(); }
 	unsigned get_width() const { return matrices.back().get_width(); }
 	
-		
 	template<typename U, class LType, class RType>
 	friend matrix_product<U, matrix_ref<U,LType>::H, matrix_ref<U,RType>::W> 
 	operator * (const matrix_ref<U,LType>& lhs, const matrix_ref<U,RType>& rhs);
@@ -184,7 +218,6 @@ class matrix_product {
 	template<typename U, unsigned h2, unsigned w2, class RType>
 	friend matrix_product<U,h2,matrix_ref<U,RType>::W> 
 	operator * (matrix_product<U,h2,w2>&& lhs, const matrix_ref<U,RType>& rhs);
-	
 	
 	matrix_product(matrix_product<T,h,w>&& X) = default;
 	
@@ -201,7 +234,6 @@ class matrix_product {
 		sizes.push_back(mat.get_width());
 	}
 	
-	// Modify RESOLVE to perform asyncronously
 	std::vector<matrix_wrap<T>> matrices;
 	std::vector<unsigned> sizes;
 };	
