@@ -150,8 +150,8 @@ std::cout << std::endl;
 // ----------------------------------------------->
 std::cout << "======= NEW TEST SECTION =======\n";
 
-unsigned const m = 10;
-unsigned const n = 10;
+unsigned const m = 4;
+unsigned const n = 4;
 bool verbose = false;
 
 double etime = omp_get_wtime();
@@ -169,12 +169,12 @@ for (int i=0; i!=n; ++i)
 matrix<int> B(n, m);
 for (int i = 0; i != n; ++i)
 for (int j = 0; j != m; ++j)
-B(i, j) = (i + 1)*(j + 1);
+B(i, j) = (j + 1);
 
 matrix<int> A(n, m);
 for (int i = 0; i != n; ++i)
 for (int j = 0; j != m; ++j)
-A(i, j) = (i + 1)*(j + 1);
+A(i, j) = (i + 1);
 
 matrix<int> C(n, m);
 for (int i = 0; i != n; ++i)
@@ -195,7 +195,24 @@ std::cout << std::endl;
 etime = omp_get_wtime() - etime;
 std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
 
-matrix<int> SS = A + B + C + A;
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << A(i, j) << ' ';
+	std::cout << '\n';
+}std::cout << '\n';
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << B(i, j) << ' ';
+	std::cout << '\n';
+}std::cout << '\n';
+
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << C(i, j) << ' ';
+	std::cout << '\n';
+}
+
+matrix<int> SS = ( A + B ) + C + A  ;
 for (int i = 0; i != m; ++i) {
 	for (int j = 0; j != n; ++j)
 		std::cout << SS(i, j) << ' ';

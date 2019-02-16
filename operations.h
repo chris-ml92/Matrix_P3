@@ -78,13 +78,23 @@ public:
 	unsigned get_width() const { return matrices.front().get_width(); }
 
 	
-	template<typename U, class LType,typename P, class RType>
+
+	template<typename U, class LType, class RType>
+	friend matrix_sum<U,matrix_ref<U,LType>::H, matrix_ref<U, LType>::W>
+		operator + (const matrix_ref<U, LType>& left, const matrix_ref<U, RType>& right);
+
+	template<typename U, class RType, unsigned h2, unsigned w2>
+	friend matrix_sum<U,h2,w2>
+		operator + (matrix_sum<U,h2,w2>&& left, const matrix_ref<U, RType>& right);
+
+
+	/*template<typename U, class LType,typename P, class RType>
 	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H == 0, matrix<typename op_traits<U, P>::sum_type>>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
 
-	template<typename U, typename P, class RType, unsigned h2, unsigned w2>
+	template<typename U, typename P, class RType>
 	friend std::enable_if_t<std::is_same<U, typename op_traits<U, P>::sum_type>::value, matrix<U>>
-		operator + (matrix_sum<U,h2,w2>&& left, const matrix_ref<P, RType>& right);
+		operator + (matrix<U>&& left, const matrix_ref<P, RType>& right);
 	
 	template<typename U, class LType, typename P, class RType>
 	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H != 0, matrix<typename op_traits<U, P>::sum_type, matrix_ref<U, LType>::H, matrix_ref<U, LType>::W>>
@@ -93,7 +103,7 @@ public:
 	template<typename U, unsigned H, unsigned W, typename P, class RType>
 	friend std::enable_if_t<matrix_ref<P, RType>::H != 0 && std::is_same<U, typename op_traits<U, P>::sum_type>::value, matrix<U, H, W>>
 		operator + (matrix<U, H, W>&& left, const matrix_ref<P, RType>& right);
-
+	*/
 	
 	matrix_sum(matrix_sum<T,h,w>&& X) = default;
 	
@@ -115,7 +125,34 @@ public:
 };
 
 
-template<typename T, class LType, typename U, class RType>
+template<typename T, class LType, class RType>
+matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>
+operator + (const matrix_ref<T, LType>& left, const matrix_ref<T, RType>& right){
+if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
+throw std::domain_error("dimension mismatch in Matrix addition");
+
+matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, RType>::W> result;
+result.add(left);
+result.add(right);
+
+return result;
+}
+
+template<typename T, class RType, unsigned h, unsigned w>
+matrix_sum<T, h, w>
+operator + (matrix_sum<T, h, w>&& left, const matrix_ref<T, RType>& right) {
+
+	if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
+		throw std::domain_error("dimension mismatch in Matrix addition");
+
+	//matrix_sum<T, matrix_ref<U,RType>::H, matrix_ref<U, RType>::W> result(std::move(left));
+	matrix_sum<T, h,w > result(std::move(left));
+	result.add(right);
+	return result;
+
+}
+
+/*template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H == 0, matrix<typename op_traits<T, U>::sum_type>>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
 
@@ -131,15 +168,18 @@ operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right)
 }
 
 
-template<typename T, typename U, class RType, unsigned h, unsigned w>
+template<typename T, typename U, class RType>
 std::enable_if_t<std::is_same<T, typename op_traits<T, U>::sum_type>::value, matrix<T>>
-operator + (matrix_sum<T,h,w>&& left, const matrix_ref<U, RType>& right) {
+operator + (matrix<T>&& left, const matrix_ref<U, RType>& right) {
 	if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
 		throw std::domain_error("dimension mismatch in Matrix addition");
 
-	matrix_sum<T, h,w> result(std::move(left));
+	//matrix_sum<T, matrix_ref<U,RType>::H, matrix_ref<U, RType>::W> result(std::move(left));
+	matrix_sum<T, matrix_ref<U, RType>::W, matrix_ref<U, RType>::W> result;
+	result.add(left);
 	result.add(right);
-	return result;
+	return std::move(result);
+
 }
 
 
@@ -167,7 +207,7 @@ operator + (matrix<T, H, W>&& left, const matrix_ref<U, RType>& right) {
 	return result;
 
 }
-
+*/
 
 
 
