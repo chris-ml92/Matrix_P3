@@ -22,6 +22,7 @@ operator + (const matrix_ref<T,LType>& left, const matrix_ref<U,RType>& right) {
 	const unsigned height=left.get_height();
 	const unsigned width=left.get_width();
 	matrix<typename op_traits<T,U>::sum_type> result(height, width);
+
 	for (unsigned i=0; i!=height; ++i)
 		for (unsigned j=0; j!=width; j++)
 			result(i,j) = left(i,j) + right(i,j);
@@ -44,7 +45,6 @@ operator + (matrix<T>&& left, const matrix_ref<U,RType>& right) {
 	return std::move(left);
 }
 
-template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T,LType>::H*matrix_ref<U,RType>::H!=0, matrix<typename op_traits<T,U>::sum_type, matrix_ref<T,LType>::H, matrix_ref<T,LType>::W>> 
 operator + (const matrix_ref<T,LType>& left, const matrix_ref<U,RType>& right) {
 	static_assert(matrix_ref<T,LType>::H==matrix_ref<U,RType>::H && matrix_ref<T,LType>::W==matrix_ref<U,RType>::W, 
@@ -121,9 +121,9 @@ class matrix_product {
 	}
 
 	matrix<T> resolveChain(std::vector<matrix_wrap<T>> list) {
-		unsigned h = list.front().get_height();
-		unsigned w = list.back().get_width();
-		matrix<T> result(h, w);
+		unsigned ah = list.front().get_height();
+		unsigned aw = list.back().get_width();
+		matrix<T> result(ah, aw);
 		unsigned n = list.size();
 		std::vector<std::vector<int>> m, s;
 		std::vector<int> p;

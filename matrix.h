@@ -4,7 +4,8 @@
 #include<vector>
 #include<memory>
 #include<cassert>
-
+#include<thread>
+#include<future>
 #include"matrix_fwd.h"
 #include"iterators.h"
 
@@ -521,6 +522,8 @@ template<typename T>
 class matrix<T> : public matrix_ref<T,Plain> {
 	public:
 	
+	matrix(){}
+
 	matrix( unsigned height, unsigned width ) {
 		this->height = height;
 		this->width = width;
@@ -538,13 +541,13 @@ class matrix<T> : public matrix_ref<T,Plain> {
 		std::cerr << "matrix copy constructor\n";
 	}
 	
-	matrix(matrix<T>&& X) {
+	/*matrix(matrix<T>&& X) {
 		height = X.height;
 		width = X.width;
 		data = std::move(X.data);
 		
 		std::cerr << "matrix move constructor\n";
-	}
+	}*/
 	
 	template<class matrix_type>
 	matrix(const matrix_ref<T,matrix_type>&X) {
@@ -602,13 +605,13 @@ class matrix<T,h,w> : public matrix_ref<T,Sized<h,w>> {
 		std::cerr << "sized matrix copy constructor\n";
 	}
 	
-		matrix(matrix<T,h,w>&& X) {
+	/*	matrix(matrix<T,h,w>&& X) {
 		height = X.height;
 		width = X.width;
 		data = std::move(X.data);
 		
 		std::cerr << "sized matrix move constructor\n";
-	}
+	}*/
 	
 
 	

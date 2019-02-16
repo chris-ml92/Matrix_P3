@@ -3,10 +3,23 @@
 #include"matrix.h"
 #include"matrix_wrap.h"
 #include"operations.h"
+#include<chrono>
+#include <mutex>
 
+std::mutex g_display_mutex;
+
+matrix<int> sum(matrix<int> x, matrix<int> y) {
+	std::thread::id this_id = std::this_thread::get_id();
+	g_display_mutex.lock();
+	std::cout << "thread " << this_id << " sleeping...\n";
+	g_display_mutex.unlock();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	return x+y;
+	
+}
 
 int main() {
-
+/*
 matrix<int> A(4,4);
 for (int i=0; i!=4; ++i)
 	for(int j=0; j!=4; ++j)
@@ -97,7 +110,7 @@ A2+B;
 
 std::cout << "=======\n";
 
-matrix<int> M = A*B*C;
+matrix<int> M = (A+B)*C;
 
 for (int i=0; i!=4; ++i) {
 	for(int j=0; j!=4; ++j)
@@ -133,12 +146,12 @@ for (int i=0; i!=4; ++i) {
 	std::cout << '\n';
 }
 std::cout << std::endl;
-
+*/
 // ----------------------------------------------->
 std::cout << "======= NEW TEST SECTION =======\n";
 
-unsigned const m = 11;
-unsigned const n = 7;
+unsigned const m = 2;
+unsigned const n = 2;
 
 double etime = omp_get_wtime();
 
@@ -152,17 +165,45 @@ for (int i=0; i!=n; ++i)
 	for(int j=0; j!=m; ++j)
 	  MMMM(i,j) = (i+1)*(j+1);
 
+matrix<int> B(n, m);
+for (int i = 0; i != n; ++i)
+for (int j = 0; j != m; ++j)
+B(i, j) = (i + 1)*(j + 1);
+
+matrix<int> A(n, m);
+for (int i = 0; i != n; ++i)
+for (int j = 0; j != m; ++j)
+A(i, j) = (i + 1)*(j + 1);
+
 matrix<int,m,n> ZZ = MM*MMMM*MM;
 
-for (int i=0; i!=m; ++i) {
+/*for (int i=0; i!=m; ++i) {
 	for(int j=0; j!=n; ++j)
 		std::cout << ZZ(i,j) << ' ';
 	std::cout << '\n';
-}
-
+}*/
+//MM + MMMM;
 std::cout << std::endl;
 etime = omp_get_wtime() - etime;
 std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
-std::getchar();
+//std::getchar();
+
+auto x = std::async (sum , MM, MMMM);
+auto y = std::async(sum, A, B);
+std::this_thread::sleep_for(std::chrono::milliseconds(20));
+matrix<int> C = (x.get())*(y.get());
+
+
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << C(i, j) << ' ';
+	std::cout << '\n';
+}
+
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << MM(i, j) << ' ';
+	std::cout << '\n';
+}
 return 0;
 }
