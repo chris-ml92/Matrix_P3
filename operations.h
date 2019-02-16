@@ -90,12 +90,22 @@ class matrix_product {
 		///////////////////////////////////////////////////////
 
 		matrix<T> m(r1, c2);
-		for (int i = 0; i < r1; ++i)
-			for (int j = 0; j < c2; ++j)
-				for (int k = 0; k < c1; ++k)
-				{
-					m(i, j) = m(i, j) + a(i, k) * b(k, j);
+
+		#pragma omp parallel
+    	{
+        	int i, j, k;
+
+			#pragma omp for
+			for (i = 0; i < r1; ++i){
+				for (j = 0; j < c2; ++j){
+					m(i, j) = 0;
+					for (k = 0; k < c1; ++k){
+						m(i, j) += a(i, k) * b(k, j);
+					}
 				}
+			}
+		}		
+
 		return m;
 	}
 	matrix<T> multiplySubSequence(std::vector<matrix_wrap<T>> A, std::vector<std::vector<int>> s, int i, int j) {

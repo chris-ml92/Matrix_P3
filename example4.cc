@@ -150,8 +150,9 @@ std::cout << std::endl;
 // ----------------------------------------------->
 std::cout << "======= NEW TEST SECTION =======\n";
 
-unsigned const m = 2;
-unsigned const n = 2;
+unsigned const m = 1000;
+unsigned const n = 1000;
+bool verbose = false;
 
 double etime = omp_get_wtime();
 
@@ -177,33 +178,38 @@ A(i, j) = (i + 1)*(j + 1);
 
 matrix<int,m,n> ZZ = MM*MMMM*MM;
 
-/*for (int i=0; i!=m; ++i) {
-	for(int j=0; j!=n; ++j)
-		std::cout << ZZ(i,j) << ' ';
-	std::cout << '\n';
-}*/
-//MM + MMMM;
+if (verbose) {
+	for (int i=0; i!=m; ++i) {
+		for(int j=0; j!=n; ++j)
+			std::cout << ZZ(i,j) << ' ';
+		std::cout << '\n';
+	}
+}
+
 std::cout << std::endl;
 etime = omp_get_wtime() - etime;
 std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
-//std::getchar();
 
-auto x = std::async (sum , MM, MMMM);
+auto x = std::async(sum, MM, MM);
 auto y = std::async(sum, A, B);
-std::this_thread::sleep_for(std::chrono::milliseconds(20));
+std::this_thread::sleep_for(std::chrono::milliseconds(50));
 matrix<int> C = (x.get())*(y.get());
 
+// Print results
+if (verbose) {
+	for (int i = 0; i != m; ++i) {
+		for (int j = 0; j != n; ++j)
+			std::cout << C(i, j) << ' ';
+		std::cout << '\n';
+	}
 
-for (int i = 0; i != m; ++i) {
-	for (int j = 0; j != n; ++j)
-		std::cout << C(i, j) << ' ';
-	std::cout << '\n';
+	for (int i = 0; i != m; ++i) {
+		for (int j = 0; j != n; ++j)
+			std::cout << MM(i, j) << ' ';
+		std::cout << '\n';
+	}
+
 }
 
-for (int i = 0; i != m; ++i) {
-	for (int j = 0; j != n; ++j)
-		std::cout << MM(i, j) << ' ';
-	std::cout << '\n';
-}
 return 0;
 }
