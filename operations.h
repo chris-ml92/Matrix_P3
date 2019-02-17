@@ -38,6 +38,10 @@ public:
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
 
 		if (i == j) {
+			std::thread::id this_id = std::this_thread::get_id();
+			std::cout << std::endl;
+			std::cout << "thread " << this_id << " sleeping...\n";
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			return A[i];
 		}
 
@@ -82,17 +86,18 @@ public:
 	unsigned get_width() const { return matrices.front().get_width(); }
 
 	
-
-	template<typename U, class LType, class RType>
+	/*NOSTRA VERSIONE*/
+	/*template<typename U, class LType, class RType>
 	friend matrix_sum<U,matrix_ref<U,LType>::H, matrix_ref<U, LType>::W>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<U, RType>& right);
 
 	template<typename U, class RType, unsigned h2, unsigned w2>
 	friend matrix_sum<U,h2,w2>
 		operator + (matrix_sum<U,h2,w2>&& left, const matrix_ref<U, RType>& right);
+		*/
 
-
-	/*template<typename U, class LType,typename P, class RType>
+		/*PROF VERSIONE*/
+	template<typename U, class LType,typename P, class RType>
 	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H == 0, matrix<typename op_traits<U, P>::sum_type>>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
 
@@ -100,7 +105,7 @@ public:
 	friend std::enable_if_t<std::is_same<U, typename op_traits<U, P>::sum_type>::value, matrix<U>>
 		operator + (matrix<U>&& left, const matrix_ref<P, RType>& right);
 	
-	template<typename U, class LType, typename P, class RType>
+	/*template<typename U, class LType, typename P, class RType>
 	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H != 0, matrix<typename op_traits<U, P>::sum_type, matrix_ref<U, LType>::H, matrix_ref<U, LType>::W>>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
 
@@ -128,8 +133,8 @@ public:
 	std::vector<unsigned> sizes;
 };
 
-
-template<typename T, class LType, class RType>
+/*VERSIONE NOSTRA CON MATRIX_SUM*/
+/*template<typename T, class LType, class RType>
 matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<T, RType>& right){
 if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
@@ -154,9 +159,10 @@ operator + (matrix_sum<T, h, w>&& left, const matrix_ref<T, RType>& right) {
 	result.add(right);
 	return result;
 
-}
+}*/
+/*VERSIONE PROF*/
 
-/*template<typename T, class LType, typename U, class RType>
+template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H == 0, matrix<typename op_traits<T, U>::sum_type>>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
 
@@ -211,7 +217,7 @@ operator + (matrix<T, H, W>&& left, const matrix_ref<U, RType>& right) {
 	return result;
 
 }
-*/
+
 
 
 

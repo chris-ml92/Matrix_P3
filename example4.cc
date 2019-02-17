@@ -13,7 +13,7 @@ matrix<int> sum(matrix<int> x, matrix<int> y) {
 	g_display_mutex.lock();
 	std::cout << "thread " << this_id << " sleeping...\n";
 	g_display_mutex.unlock();
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	//std::this_thread::sleep_for(std::chrono::seconds(1));
 	return x+y;
 	
 }
@@ -225,12 +225,12 @@ for (int i = 0; i != m; ++i) {
 	std::cout << '\n';
 }
 
-/*matrix<int> SD = (A + B) * (C + SS);
+matrix<int> SD = (A + B) * (C + SS);
 for (int i = 0; i != m; ++i) {
 	for (int j = 0; j != n; ++j)
 		std::cout << AMM(i, j) << ' ';
 	std::cout << '\n';
-*/
+}
 // Testing Async
 /*
 auto x = std::async(sum, MM, MM);
