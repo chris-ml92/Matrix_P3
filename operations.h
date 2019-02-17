@@ -261,7 +261,9 @@ class matrix_product {
 		int k = s[i][j];
 		std::future<matrix<T>> X = std::async([=] { return multiplySubSequence(A, s, i, k); });
 		std::future<matrix<T>> Y = std::async([=] { return multiplySubSequence(A, s, k + 1, j); });
-		return singleMultiplication(X.get(), Y.get());
+		matrix<T> r1 = X.get();
+		matrix<T> r2 = Y.get();
+		return singleMultiplication(r1, r2);
 	}
 
 	std::vector<int> extractDims(std::vector<matrix_wrap<T>> list) {
