@@ -195,7 +195,7 @@ std::cout << std::endl;
 etime = omp_get_wtime() - etime;
 std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
 
-for (int i = 0; i != m; ++i) {
+/*for (int i = 0; i != m; ++i) {
 	for (int j = 0; j != n; ++j)
 		std::cout << A(i, j) << ' ';
 	std::cout << '\n';
@@ -210,7 +210,7 @@ for (int i = 0; i != m; ++i) {
 	for (int j = 0; j != n; ++j)
 		std::cout << C(i, j) << ' ';
 	std::cout << '\n';
-}
+}*/
 
 matrix<int> SS = ( A + B ) + C + A  ;
 for (int i = 0; i != m; ++i) {
@@ -224,6 +224,13 @@ for (int i = 0; i != m; ++i) {
 		std::cout << AMM(i, j) << ' ';
 	std::cout << '\n';
 }
+
+/*matrix<int> SD = (A + B) * (C + SS);
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << AMM(i, j) << ' ';
+	std::cout << '\n';
+*/
 // Testing Async
 /*
 auto x = std::async(sum, MM, MM);

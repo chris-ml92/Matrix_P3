@@ -42,10 +42,13 @@ public:
 		}
 
 		int m = (i + j) / 2;
-
+		/*
 		matrix<T> X = subAddiction(A, i, m);
-		matrix<T> Y = subAddiction(A, m + 1, j);
-		return singleAddiction(X, Y);
+		matrix<T> Y = subAddiction(A, m + 1, j);*/
+		std::future<matrix<T>> X = std::async([&] {return subAddiction(A, i, m); });
+		std::future<matrix<T>> Y = std::async([&] {return subAddiction(A, m+1, j); });
+
+		return singleAddiction(X.get(), Y.get());
 	}
 
 	matrix<T> addMatrices(std::vector<matrix_wrap<T>> list) {
