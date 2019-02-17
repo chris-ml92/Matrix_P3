@@ -218,7 +218,12 @@ for (int i = 0; i != m; ++i) {
 		std::cout << SS(i, j) << ' ';
 	std::cout << '\n';
 }
-
+matrix<int> AMM = A * B * C;
+for (int i = 0; i != m; ++i) {
+	for (int j = 0; j != n; ++j)
+		std::cout << AMM(i, j) << ' ';
+	std::cout << '\n';
+}
 // Testing Async
 /*
 auto x = std::async(sum, MM, MM);

@@ -549,9 +549,9 @@ class matrix<T> : public matrix_ref<T,Plain> {
 		std::cerr << "matrix move constructor\n";
 	}
 
-	/*matrix(const matrix<T>& X) = default;
-	matrix& operator=(const matrix& X) = default;
-	*/
+	//matrix(const matrix<T>& X) = default; // quest no, evidentemente
+	matrix& operator=(const matrix& X) = default; //serve alle future
+	
 	template<class matrix_type>
 	matrix(const matrix_ref<T,matrix_type>&X) {
 		height = X.get_height();
