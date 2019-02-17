@@ -45,8 +45,8 @@ public:
 		/*
 		matrix<T> X = subAddiction(A, i, m);
 		matrix<T> Y = subAddiction(A, m + 1, j);*/
-		std::future<matrix<T>> X = std::async([=] {return subAddiction(A, i, m); });
-		std::future<matrix<T>> Y = std::async([=] {return subAddiction(A, m+1, j); });
+		std::future<matrix<T>> X = std::async([&] {return subAddiction(A, i, m); });
+		std::future<matrix<T>> Y = std::async([&] {return subAddiction(A, m+1, j); });
 		matrix<T> r1 = X.get();
 		matrix<T> r2 = Y.get();
 		return singleAddiction(r1, r2);
@@ -260,8 +260,8 @@ class matrix_product {
 			return A[i]; //uses matrix_wrap operator conversion to matrix
 		}
 		int k = s[i][j];
-		std::future<matrix<T>> X = std::async([=] { return multiplySubSequence(A, s, i, k); });
-		std::future<matrix<T>> Y = std::async([=] { return multiplySubSequence(A, s, k + 1, j); });
+		std::future<matrix<T>> X = std::async([&] { return multiplySubSequence(A, s, i, k); });
+		std::future<matrix<T>> Y = std::async([&] { return multiplySubSequence(A, s, k + 1, j); });
 		matrix<T> r1 = X.get();
 		matrix<T> r2 = Y.get();
 		return singleMultiplication(r1, r2);
