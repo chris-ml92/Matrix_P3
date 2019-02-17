@@ -45,10 +45,11 @@ public:
 		/*
 		matrix<T> X = subAddiction(A, i, m);
 		matrix<T> Y = subAddiction(A, m + 1, j);*/
-		std::future<matrix<T>> X = std::async([&] {return subAddiction(A, i, m); });
-		std::future<matrix<T>> Y = std::async([&] {return subAddiction(A, m+1, j); });
-
-		return singleAddiction(X.get(), Y.get());
+		std::future<matrix<T>> X = std::async([=] {return subAddiction(A, i, m); });
+		std::future<matrix<T>> Y = std::async([=] {return subAddiction(A, m+1, j); });
+		matrix<T> r1 = X.get();
+		matrix<T> r2 = Y.get();
+		return singleAddiction(r1, r2);
 	}
 
 	matrix<T> addMatrices(std::vector<matrix_wrap<T>> list) {
