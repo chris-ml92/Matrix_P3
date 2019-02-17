@@ -41,7 +41,7 @@ public:
 			std::thread::id this_id = std::this_thread::get_id();
 			std::cout << std::endl;
 			std::cout << "thread " << this_id << " sleeping...\n";
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			//std::this_thread::sleep_for(std::chrono::seconds(1));
 			return A[i];
 		}
 
