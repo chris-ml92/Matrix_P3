@@ -168,18 +168,18 @@ for (int i=0; i!=n; ++i)
 
 matrix<int> B(n, m);
 for (int i = 0; i != n; ++i)
-for (int j = 0; j != m; ++j)
-B(i, j) = (j + 1);
+    for (int j = 0; j != m; ++j)
+        B(i, j) = (j + 1);
 
 matrix<int> A(n, m);
 for (int i = 0; i != n; ++i)
-for (int j = 0; j != m; ++j)
-A(i, j) = (i + 1);
+    for (int j = 0; j != m; ++j)
+        A(i, j) = (i + 1);
 
 matrix<int> C(n, m);
 for (int i = 0; i != n; ++i)
-for (int j = 0; j != m; ++j)
-C(i, j) = (i + 1)*(j + 1);
+    for (int j = 0; j != m; ++j)
+        C(i, j) = (i + 1)*(j + 1);
 
 matrix<int,m,n> ZZ = MM*MMMM*MM;
 
@@ -236,7 +236,8 @@ for (int i = 0; i != m; ++i) {
 auto x = std::async(sum, MM, MM);
 auto y = std::async(sum, A, B);
 std::this_thread::sleep_for(std::chrono::milliseconds(50));
-matrix<int> C = (x.get())*(y.get());*/
+matrix<int> C = (x.get())*(y.get());
+*/
 
 return 0;
 }
