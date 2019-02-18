@@ -110,6 +110,9 @@
     <ClCompile>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="example4.cc" />

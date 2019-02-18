@@ -8,15 +8,7 @@
 
 std::mutex g_display_mutex;
 
-matrix<int> sum(matrix<int> x, matrix<int> y) {
-	std::thread::id this_id = std::this_thread::get_id();
-	g_display_mutex.lock();
-	std::cout << "thread " << this_id << " sleeping...\n";
-	g_display_mutex.unlock();
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-	return x+y;
-	
-}
+
 
 int main() {
 /*
@@ -161,6 +153,7 @@ const char* menu = R"(Select Test case:
 		4- small sized chain [A op B op C]
 		5- medium sized chain [A op B op C op D op E]
 		6- large sized chain [A op B op C op D op E op F op G op H]
+		7- Sum - product chain [A + B op C + D]
 )";
 std::cout << menu << std::endl;
 
@@ -170,7 +163,7 @@ std::cout << "Option chosen: " << choiche<< std::endl;
 double etime = omp_get_wtime();
 // empty case
 m = n = 1;
-if (choiche == 4 || choiche == 5 || choiche == 6) {
+if (choiche == 4 || choiche == 5 || choiche == 6 || choiche == 7) {
 	unsigned s;
 	std::cout << "Choose size of matrices: ";
 	std::cin >> s;
@@ -180,12 +173,14 @@ if (choiche == 4 || choiche == 5 || choiche == 6) {
 else if (choiche == 1) { m = n = 32; }
 else if (choiche == 2) { m = n = 128; }
 else if (choiche == 3) { m = n = 1024; }
-matrix<int> A(m, n);
+matrix<int> A(m, n), C(m,n), D(m,n);
 matrix<int> B(m, n);
 for (int i = 0; i < m; i++) {
 	for (int j = 0; j < n; j++) {
 		A(i, j) = 1;
-		B(i, j) = 1;
+		B(i, j) = 2;
+		C(i, j) = 3;
+		D(i, j) = 4;
 	}
 }
 matrix<int> S, M;
@@ -213,6 +208,16 @@ case 6:
 	etime = omp_get_wtime();
 	S = A + B + A + B + A + B + A + B;
 	M = A * B * A * B * A * B * A * B;
+	break;
+case 7:
+	etime = omp_get_wtime();
+	S = (A + B) * ( C + D );
+	/*for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			std::cout << S(i, j) << " ";
+		}std::cout << std::endl;
+	}*/
+
 	break;
 default:
 	break;
