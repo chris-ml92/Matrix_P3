@@ -45,8 +45,8 @@ class matrix_sum {
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
 		if (i == j) {
 			std::thread::id this_id = std::this_thread::get_id();
-			std::cout << std::endl << "thread " << this_id << std::endl;
-			std::this_thread::sleep_for(std::chrono::seconds(2));
+			std::cout << "thread " << this_id << std::endl;
+			//std::this_thread::sleep_for(std::chrono::seconds(2));
 			return A[i];
 		}
 
@@ -227,7 +227,6 @@ class matrix_product {
 		#pragma omp parallel
     	{
         	int i, j, k;
-
 			#pragma omp for
 			for (i = 0; i < r1; ++i){
 				for (j = 0; j < c2; ++j){
@@ -243,9 +242,7 @@ class matrix_product {
 	}
 	
 	matrix<T> multiplySubSequence(std::vector<matrix_wrap<T>> A, std::vector<std::vector<int>> s, int i, int j) {
-		if (i == j) {
-			//std::thread::id this_id = std::this_thread::get_id();
-			//std::cout << std::endl << "thread " << this_id << std::endl;
+		if (i == j) {;
 			return A[i]; //uses matrix_wrap operator conversion to matrix
 		}
 		int k = s[i][j];
