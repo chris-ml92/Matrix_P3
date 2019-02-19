@@ -172,12 +172,13 @@ const char* menu = R"(Select Test case:
 		2- medium operations [A op B]: A = (256x256), B = (256x256) 
 		3- large operations  [A op B]: A = (1024x1024), B = (1024x1024)
 	[Concurrency]
-		4- small sized chain [A op B op C]
-		5- medium sized chain [A op B op C op D op E]
-		6- large sized chain [A op B op C op D op E op F op G op H]
+		4- small sized chain   [A op B op C]
+		5- medium sized chain  [A op B op C op D op E]
+		6- large sized chain   [A op B op C op D op E op F op G op H]
 		7- Sum - product chain [A + B op C + D]
-	[Template Sizes]
-		8- normal operations  [A op B]: A = (128x128), B = (128x128);
+	[Template Sizes + Parallelism]
+		8- normal operations [A op B]: A = (128x128), B = (128x128);
+		9- large operations  [C op D]: C = (1024x1024), D = (1024x1024);
 )";
 std::cout << menu << std::endl;
 
@@ -214,6 +215,7 @@ matrix<int> S, M;
 
 // Sized
 matrix<int,128,128> AA, BB, SS, MM;
+matrix<int,1024,1024> CC, DD, SSS, MMM;
 
 switch (choiche)
 {
@@ -256,6 +258,11 @@ case 8:
 	etime = omp_get_wtime();
 	SS = AA + BB;
 	MM = AA * BB;
+	break;
+case 9:
+	etime = omp_get_wtime();
+	SSS = CC + DD;
+	MMM = CC * DD;
 	break;
 default:
 	break;
