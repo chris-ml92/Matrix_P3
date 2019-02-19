@@ -13,19 +13,15 @@ struct op_traits {
 	typedef decltype(T() * U()) prod_type;
 };
 
+/*#####################################################################################*/
+									/*MATRIX SUM*/
+/*#####################################################################################*/
 
-
-
-// Somma
 template<typename T,unsigned h, unsigned w>
 class matrix_sum {
-
-
-
-public:
+	public:
 
 	matrix<T> singleAddiction(matrix<T>& a, matrix<T>& b) {
-
 		const unsigned height = a.get_height();
 		const unsigned width = a.get_width();
 
@@ -47,7 +43,6 @@ public:
 
 
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
-
 		if (i == j) {
 			std::thread::id this_id = std::this_thread::get_id();
 			std::cout << std::endl << "thread " << this_id << std::endl;
@@ -69,13 +64,9 @@ public:
 		unsigned aw = list.front().get_width();
 		matrix<T> result(ah, aw);
 		unsigned n = list.size();
-
 		return subAddiction(list,0,n-1);
 	}
 
-
-
-	
 	static constexpr unsigned H=h;
 	static constexpr unsigned W=w;
 
@@ -90,10 +81,9 @@ public:
 		return addMatrices(matrices);
 	}
 	
-	// Dimensioni delle matrici, sono tutte uguali
+	// Sizes of matrices, they are all equal in sums
 	unsigned get_height() const { return matrices.front().get_height(); }
 	unsigned get_width() const { return matrices.front().get_width(); }
-
 	
 	/*NOSTRA VERSIONE*/
 	template<typename U, class LType, class RType>
@@ -129,17 +119,15 @@ public:
 	matrix_sum() = default; 
 	
 	template<unsigned w2>
-	matrix_sum(matrix_sum<T,h,w2>&& X) : matrices(std::move(X.matrices)), sizes(std::move(X.sizes)) {}
+	matrix_sum(matrix_sum<T,h,w2>&& X) : matrices(std::move(X.matrices)) {}
 	
 	template<class matrix_type>
 	void add(matrix_ref<T,matrix_type> mat) {
 		matrices.emplace_back(mat);
-		sizes.push_back(mat.get_width());
 	}
 	
 	// Elenco matrici da sommare
 	std::vector<matrix_wrap<T>> matrices;
-	std::vector<unsigned> sizes;
 };
 
 /*VERSIONE NOSTRA CON MATRIX_SUM*/
@@ -152,7 +140,6 @@ operator + (const matrix_ref<T, LType>& left, const matrix_ref<T, RType>& right)
 	matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, RType>::W> result;
 	result.add(left);
 	result.add(right);
-
 	return result;
 }
 
@@ -167,84 +154,64 @@ operator + (matrix_sum<T, h, w>&& left, const matrix_ref<T, RType>& right) {
 	matrix_sum<T, h, w > result(std::move(left));
 	result.add(right);
 	return result;
-
 }
 
-
 /*VERSIONE PROF*/
-
 /*template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H == 0, matrix<typename op_traits<T, U>::sum_type>>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
-
 	if (left.get_height()!=right.get_height() || left.get_width()!=right.get_width())
 		throw std::domain_error("dimension mismatch in Matrix addition");
-
 	matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<U, RType>::W> result;
 	result.add(left);
 	result.add(right);
-
-
 	return result;
 }
-
 
 template<typename T, typename U, class RType>
 std::enable_if_t<std::is_same<T, typename op_traits<T, U>::sum_type>::value, matrix<T>>
 operator + (matrix<T>&& left, const matrix_ref<U, RType>& right) {
 	if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
 		throw std::domain_error("dimension mismatch in Matrix addition");
-
 	//matrix_sum<T, matrix_ref<U,RType>::H, matrix_ref<U, RType>::W> result(std::move(left));
 	matrix_sum<T, matrix_ref<U, RType>::W, matrix_ref<U, RType>::W> result;
 	result.add(left);
 	result.add(right);
 	return std::move(result);
-
 }
-
 
 template<typename T, class LType, typename U, class RType>
 std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H != 0, matrix<typename op_traits<T, U>::sum_type, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
 	static_assert(matrix_ref<T, LType>::H == matrix_ref<U, RType>::H && matrix_ref<T, LType>::W == matrix_ref<U, RType>::W,
 		"dimension mismatch in Matrix addition");
-
 	matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<U, RType>::W> result;
 	result.add(left);
 	result.add(right);
 	return result;
 }
 
-
 template<typename T, unsigned H, unsigned W, typename U, class RType>
 std::enable_if_t<matrix_ref<U, RType>::H != 0 && std::is_same<T, typename op_traits<T, U>::sum_type>::value, matrix<T, H, W>>
 operator + (matrix<T, H, W>&& left, const matrix_ref<U, RType>& right) {
 	static_assert(H == matrix_ref<U, RType>::H && W == matrix_ref<U, RType>::W,
 		"dimension mismatch in Matrix addition");
-
 	matrix_sum<T, H, W> result(std::move(left));
 	result.add(right);
 	return result;
-
 }*/
-
-
-
-
-
-
 
 /*#####################################################################################*/
 									/*MATRIX PRODUCT*/
 /*#####################################################################################*/
 
-
 template<typename T,unsigned h, unsigned w>
 class matrix_product {
-	template<typename T, unsigned h, unsigned w>
+	template<typename T1, unsigned h1, unsigned w1>
 	friend class matrix_sum;
+	
 	private:
+	
 	matrix<T> singleMultiplication(matrix<T>& a, matrix<T>& b) {
 		int r1 = a.get_height();
 		int r2 = b.get_height();
@@ -274,11 +241,12 @@ class matrix_product {
 
 		return m;
 	}
+	
 	matrix<T> multiplySubSequence(std::vector<matrix_wrap<T>> A, std::vector<std::vector<int>> s, int i, int j) {
 		if (i == j) {
-			/*std::thread::id this_id = std::this_thread::get_id();
-			std::cout << std::endl << "thread " << this_id << std::endl;
-			*/return A[i]; //uses matrix_wrap operator conversion to matrix
+			//std::thread::id this_id = std::this_thread::get_id();
+			//std::cout << std::endl << "thread " << this_id << std::endl;
+			return A[i]; //uses matrix_wrap operator conversion to matrix
 		}
 		int k = s[i][j];
 		std::future<matrix<T>> X = std::async([&] { return multiplySubSequence(A, s, i, k); });
@@ -343,7 +311,6 @@ class matrix_product {
 	matrix<T> sum(matrix_sum<T, H, W>& add) {
 		return add;
 	}
-
 	
 	unsigned get_height() const { return matrices.front().get_height(); }
 	unsigned get_width() const { return matrices.back().get_width(); }
@@ -356,9 +323,15 @@ class matrix_product {
 	friend matrix_product<U,h2,matrix_ref<U,RType>::W> 
 	operator * (matrix_product<U,h2,w2>&& lhs, const matrix_ref<U,RType>& rhs);
 	
+	/* ORIGINAL
 	template<typename U, unsigned h2, unsigned w2>
 	friend matrix_product<U, h2, w2>
 		operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right);
+	*/
+	
+	template<typename U, unsigned lh, unsigned lw, unsigned rh, unsigned rw>
+	friend matrix_product<U, lh, rw>
+	operator * (matrix_sum<U,lh,lw> lhs, matrix_sum<U,rh,rw> rhs);
 
 	matrix_product(matrix_product<T,h,w>&& X) = default;
 	
@@ -367,16 +340,14 @@ class matrix_product {
 	matrix_product()=default;
 	
 	template<unsigned w2>
-	matrix_product(matrix_product<T,h,w2>&& X) : matrices(std::move(X.matrices)), sizes(std::move(X.sizes)) {}
+	matrix_product(matrix_product<T,h,w2>&& X) : matrices(std::move(X.matrices)) {}
 	
 	template<class matrix_type>
 	void add(matrix_ref<T,matrix_type> mat) {
 		matrices.emplace_back(mat);
-		sizes.push_back(mat.get_width());
 	}
 	
 	std::vector<matrix_wrap<T>> matrices;
-	std::vector<unsigned> sizes;
 };	
 	
 template<typename T, class LType, class RType>
@@ -404,11 +375,28 @@ operator * (matrix_product<T,h,w>&& lhs, const matrix_ref<T,RType>& rhs) {
 	return result;
 }
 
+template<typename U, unsigned lh, unsigned lw, unsigned rh, unsigned rw>
+matrix_product<U, lh, rw>
+operator * (matrix_sum<U,lh,lw> lhs, matrix_sum<U,rh,rw> rhs) {
 
+	if (lhs.get_width()!=rhs.get_height())
+		throw std::domain_error("dimension mismatch in Matrix multiplication");
+	
+	matrix_product<U, lh, rw> result;
+	std::future<matrix<U>> X = std::async([&] { return (matrix<U>)lhs; });
+	std::future<matrix<U>> Y = std::async([&] { return (matrix<U>)rhs; });
+	matrix<U> x = X.get();
+	matrix<U> y = Y.get();
+	result.add(x);
+	result.add(y);
+	return result;
+}
+
+/* ORIGINAL
 template<typename U, unsigned h2, unsigned w2>
 matrix_product<U, h2, w2>
 operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right) {
-	
+
 	matrix_product<U, h2, w2> xx,yy;
 	std::future<matrix<U>> X = std::async([&]  { return (matrix<U>)left; });
 	std::future<matrix<U>> Y = std::async([&] { return  (matrix<U>)right; });
@@ -420,5 +408,6 @@ operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right) {
 
 	return result;
 }
-	
+*/
+
 #endif // OPERATIONS_H 
