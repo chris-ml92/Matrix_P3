@@ -31,19 +31,27 @@ public:
 
 		matrix<T> m(height, width);
 
-		for (unsigned i = 0; i != height; ++i)
-			for (unsigned j = 0; j != width; j++)
-				m(i, j) = a(i, j) + b(i, j);
-
+		#pragma omp parallel
+		{
+			int i, j;
+			#pragma omp for
+			for (i = 0; i < height; ++i) {
+				for (j = 0; j < width; j++) {
+					m(i, j) = a(i, j) + b(i, j);
+				}
+			}
+		}
 		return m;
+
 	}
+
 
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
 
 		if (i == j) {
 			std::thread::id this_id = std::this_thread::get_id();
 			std::cout << std::endl << "thread " << this_id << std::endl;
-			//std::this_thread::sleep_for(std::chrono::seconds(2));
+			std::this_thread::sleep_for(std::chrono::seconds(2));
 			return A[i];
 		}
 
@@ -333,8 +341,7 @@ class matrix_product {
 	}
 
 	matrix<T> sum(matrix_sum<T, H, W>& add) {
-		matrix<T> x = add;
-		return x;
+		return add;
 	}
 
 	
@@ -403,8 +410,8 @@ matrix_product<U, h2, w2>
 operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right) {
 	
 	matrix_product<U, h2, w2> xx,yy;
-	std::future<matrix<U>> X = std::async([&]  { return xx.sum(left); });
-	std::future<matrix<U>> Y = std::async([&] { return yy.sum(right); });
+	std::future<matrix<U>> X = std::async([&]  { return (matrix<U>)left; });
+	std::future<matrix<U>> Y = std::async([&] { return  (matrix<U>)right; });
 	matrix<U> x = X.get();
 	matrix<U> y = Y.get();
 	matrix_product<U, h2, w2 > result;
