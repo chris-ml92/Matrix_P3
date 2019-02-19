@@ -176,6 +176,8 @@ const char* menu = R"(Select Test case:
 		5- medium sized chain [A op B op C op D op E]
 		6- large sized chain [A op B op C op D op E op F op G op H]
 		7- Sum - product chain [A + B op C + D]
+	[Template Sizes]
+		8- normal operations  [A op B]: A = (128x128), B = (128x128);
 )";
 std::cout << menu << std::endl;
 
@@ -196,8 +198,10 @@ if (choiche == 4 || choiche == 5 || choiche == 6 || choiche == 7) {
 else if (choiche == 1) { m = n = 32; }
 else if (choiche == 2) { m = n = 128; }
 else if (choiche == 3) { m = n = 1024; }
+
 matrix<int> A(m, n), C(m,n), D(m,n);
 matrix<int> B(m, n);
+
 for (int i = 0; i < m; i++) {
 	for (int j = 0; j < n; j++) {
 		A(i, j) = 1;
@@ -207,6 +211,10 @@ for (int i = 0; i < m; i++) {
 	}
 }
 matrix<int> S, M;
+
+// Sized
+matrix<int,128,128> AA, BB, SS, MM;
+
 switch (choiche)
 {
 case 1:
@@ -235,12 +243,19 @@ case 6:
 case 7:
 	etime = omp_get_wtime();
 	S = (A + B) * ( C + D );
-	/*for (int i = 0; i < m; i++) {
+	/*
+	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
 			std::cout << S(i, j) << " ";
 		}std::cout << std::endl;
-	}*/
+	}
+	*/
 
+	break;
+case 8:
+	etime = omp_get_wtime();
+	SS = AA + BB;
+	MM = AA * BB;
 	break;
 default:
 	break;
