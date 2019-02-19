@@ -6,8 +6,6 @@
 #include<chrono>
 #include <mutex>
 
-std::mutex g_display_mutex;
-
 int main() {
 	/*
 	matrix<int> A(4,4);

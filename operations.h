@@ -44,9 +44,9 @@ class matrix_sum {
 
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
 		if (i == j) {
-			std::thread::id this_id = std::this_thread::get_id();
+			/*std::thread::id this_id = std::this_thread::get_id();
 			std::cout << "thread " << this_id << std::endl;
-			//std::this_thread::sleep_for(std::chrono::seconds(2));
+			std::this_thread::sleep_for(std::chrono::seconds(2));*/
 			return A[i];
 		}
 
@@ -85,7 +85,7 @@ class matrix_sum {
 	unsigned get_height() const { return matrices.front().get_height(); }
 	unsigned get_width() const { return matrices.front().get_width(); }
 	
-	/*NOSTRA VERSIONE*/
+	/*OUR VERSION*/
 	template<typename U, class LType, class RType>
 	friend matrix_sum<U,matrix_ref<U,LType>::H, matrix_ref<U, LType>::W>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<U, RType>& right);
@@ -95,7 +95,7 @@ class matrix_sum {
 		operator + (matrix_sum<U,h2,w2>&& left, const matrix_ref<U, RType>& right);
 
 
-		/*PROF VERSIONE*/
+		/*PROF'S VERSION*/
 	/*template<typename U, class LType,typename P, class RType>
 	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H == 0, matrix<typename op_traits<U, P>::sum_type>>
 		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
@@ -130,7 +130,7 @@ class matrix_sum {
 	std::vector<matrix_wrap<T>> matrices;
 };
 
-/*VERSIONE NOSTRA CON MATRIX_SUM*/
+/*OUR VERSION WITH MATRIX_SUM*/
 template<typename T, class LType, class RType>
 matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<T, RType>& right) {
@@ -150,7 +150,6 @@ operator + (matrix_sum<T, h, w>&& left, const matrix_ref<T, RType>& right) {
 	if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
 		throw std::domain_error("dimension mismatch in Matrix addition");
 
-	//matrix_sum<T, matrix_ref<U,RType>::H, matrix_ref<U, RType>::W> result(std::move(left));
 	matrix_sum<T, h, w > result(std::move(left));
 	result.add(right);
 	return result;
@@ -242,7 +241,7 @@ class matrix_product {
 	}
 	
 	matrix<T> multiplySubSequence(std::vector<matrix_wrap<T>> A, std::vector<std::vector<int>> s, int i, int j) {
-		if (i == j) {;
+		if (i == j) {
 			return A[i]; //uses matrix_wrap operator conversion to matrix
 		}
 		int k = s[i][j];
@@ -304,10 +303,6 @@ class matrix_product {
 	operator matrix<T,h2,w2>() {
 		return resolveChain(matrices);
 	}
-
-	matrix<T> sum(matrix_sum<T, H, W>& add) {
-		return add;
-	}
 	
 	unsigned get_height() const { return matrices.front().get_height(); }
 	unsigned get_width() const { return matrices.back().get_width(); }
@@ -319,12 +314,6 @@ class matrix_product {
 	template<typename U, unsigned h2, unsigned w2, class RType>
 	friend matrix_product<U,h2,matrix_ref<U,RType>::W> 
 	operator * (matrix_product<U,h2,w2>&& lhs, const matrix_ref<U,RType>& rhs);
-	
-	/* ORIGINAL
-	template<typename U, unsigned h2, unsigned w2>
-	friend matrix_product<U, h2, w2>
-		operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right);
-	*/
 	
 	template<typename U, unsigned lh, unsigned lw, unsigned rh, unsigned rw>
 	friend matrix_product<U, lh, rw>
@@ -389,22 +378,5 @@ operator * (matrix_sum<U,lh,lw> lhs, matrix_sum<U,rh,rw> rhs) {
 	return result;
 }
 
-/* ORIGINAL
-template<typename U, unsigned h2, unsigned w2>
-matrix_product<U, h2, w2>
-operator * (matrix_sum<U, h2, w2>& left, matrix_sum<U, h2, w2>& right) {
-
-	matrix_product<U, h2, w2> xx,yy;
-	std::future<matrix<U>> X = std::async([&]  { return (matrix<U>)left; });
-	std::future<matrix<U>> Y = std::async([&] { return  (matrix<U>)right; });
-	matrix<U> x = X.get();
-	matrix<U> y = Y.get();
-	matrix_product<U, h2, w2 > result;
-	result.add(x);
-	result.add(y);
-
-	return result;
-}
-*/
 
 #endif // OPERATIONS_H 
