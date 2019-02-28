@@ -270,6 +270,5 @@ std::cout << "Time elapsed: " << etime << " seconds." << std::endl;
 
 
 std::getchar();
-std::getchar();
 return 0;
 }
