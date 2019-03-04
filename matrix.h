@@ -549,8 +549,7 @@ class matrix<T> : public matrix_ref<T,Plain> {
 		std::cerr << "matrix move constructor\n";
 	}
 
-	//matrix(const matrix<T>& X) = default; // quest no, evidentemente
-	matrix& operator=(const matrix& X) = default; //serve alle future
+	matrix& operator=(const matrix& X) = default;
 	
 	template<class matrix_type>
 	matrix(const matrix_ref<T,matrix_type>&X) {
@@ -607,17 +606,6 @@ class matrix<T,h,w> : public matrix_ref<T,Sized<h,w>> {
 		
 		std::cerr << "sized matrix copy constructor\n";
 	}
-	
-	/*	matrix(matrix<T,h,w>&& X) {
-		height = X.height;
-		width = X.width;
-		data = std::move(X.data);
-		
-		std::cerr << "sized matrix move constructor\n";
-	}*/
-	
-
-	
 	template<class matrix_type>
 	matrix(const matrix_ref<T,matrix_type>&X) {
 		static_assert((matrix_ref<T,matrix_type>::H==0 || matrix_ref<T,matrix_type>::H==h) && (

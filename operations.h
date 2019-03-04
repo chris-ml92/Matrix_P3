@@ -44,9 +44,6 @@ class matrix_sum {
 
 	matrix<T> subAddiction(std::vector<matrix_wrap<T>> A, int i, int j) {
 		if (i == j) {
-			/*std::thread::id this_id = std::this_thread::get_id();
-			std::cout << "thread " << this_id << std::endl;
-			std::this_thread::sleep_for(std::chrono::seconds(2));*/
 			return A[i];
 		}
 
@@ -93,25 +90,6 @@ class matrix_sum {
 	template<typename U, class RType, unsigned h2, unsigned w2>
 	friend matrix_sum<U,h2,w2>
 		operator + (matrix_sum<U,h2,w2>&& left, const matrix_ref<U, RType>& right);
-
-
-		/*PROF'S VERSION*/
-	/*template<typename U, class LType,typename P, class RType>
-	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H == 0, matrix<typename op_traits<U, P>::sum_type>>
-		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
-
-	template<typename U, typename P, class RType>
-	friend std::enable_if_t<std::is_same<U, typename op_traits<U, P>::sum_type>::value, matrix<U>>
-		operator + (matrix<U>&& left, const matrix_ref<P, RType>& right);
-	
-	template<typename U, class LType, typename P, class RType>
-	friend std::enable_if_t<matrix_ref<U, LType>::H*matrix_ref<P, RType>::H != 0, matrix<typename op_traits<U, P>::sum_type, matrix_ref<U, LType>::H, matrix_ref<U, LType>::W>>
-		operator + (const matrix_ref<U, LType>& left, const matrix_ref<P, RType>& right);
-
-	template<typename U, unsigned H, unsigned W, typename P, class RType>
-	friend std::enable_if_t<matrix_ref<P, RType>::H != 0 && std::is_same<U, typename op_traits<U, P>::sum_type>::value, matrix<U, H, W>>
-		operator + (matrix<U, H, W>&& left, const matrix_ref<P, RType>& right);
-	*/
 	
 	matrix_sum(matrix_sum<T,h,w>&& X) = default;
 	
@@ -125,12 +103,9 @@ class matrix_sum {
 	void add(matrix_ref<T,matrix_type> mat) {
 		matrices.emplace_back(mat);
 	}
-	
-	// Elenco matrici da sommare
 	std::vector<matrix_wrap<T>> matrices;
 };
 
-/*OUR VERSION WITH MATRIX_SUM*/
 template<typename T, class LType, class RType>
 matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>
 operator + (const matrix_ref<T, LType>& left, const matrix_ref<T, RType>& right) {
@@ -154,51 +129,6 @@ operator + (matrix_sum<T, h, w>&& left, const matrix_ref<T, RType>& right) {
 	result.add(right);
 	return result;
 }
-
-/*VERSIONE PROF*/
-/*template<typename T, class LType, typename U, class RType>
-std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H == 0, matrix<typename op_traits<T, U>::sum_type>>
-operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
-	if (left.get_height()!=right.get_height() || left.get_width()!=right.get_width())
-		throw std::domain_error("dimension mismatch in Matrix addition");
-	matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<U, RType>::W> result;
-	result.add(left);
-	result.add(right);
-	return result;
-}
-
-template<typename T, typename U, class RType>
-std::enable_if_t<std::is_same<T, typename op_traits<T, U>::sum_type>::value, matrix<T>>
-operator + (matrix<T>&& left, const matrix_ref<U, RType>& right) {
-	if (left.get_height() != right.get_height() || left.get_width() != right.get_width())
-		throw std::domain_error("dimension mismatch in Matrix addition");
-	//matrix_sum<T, matrix_ref<U,RType>::H, matrix_ref<U, RType>::W> result(std::move(left));
-	matrix_sum<T, matrix_ref<U, RType>::W, matrix_ref<U, RType>::W> result;
-	result.add(left);
-	result.add(right);
-	return std::move(result);
-}
-
-template<typename T, class LType, typename U, class RType>
-std::enable_if_t<matrix_ref<T, LType>::H*matrix_ref<U, RType>::H != 0, matrix<typename op_traits<T, U>::sum_type, matrix_ref<T, LType>::H, matrix_ref<T, LType>::W>>
-operator + (const matrix_ref<T, LType>& left, const matrix_ref<U, RType>& right) {
-	static_assert(matrix_ref<T, LType>::H == matrix_ref<U, RType>::H && matrix_ref<T, LType>::W == matrix_ref<U, RType>::W,
-		"dimension mismatch in Matrix addition");
-	matrix_sum<T, matrix_ref<T, LType>::H, matrix_ref<U, RType>::W> result;
-	result.add(left);
-	result.add(right);
-	return result;
-}
-
-template<typename T, unsigned H, unsigned W, typename U, class RType>
-std::enable_if_t<matrix_ref<U, RType>::H != 0 && std::is_same<T, typename op_traits<T, U>::sum_type>::value, matrix<T, H, W>>
-operator + (matrix<T, H, W>&& left, const matrix_ref<U, RType>& right) {
-	static_assert(H == matrix_ref<U, RType>::H && W == matrix_ref<U, RType>::W,
-		"dimension mismatch in Matrix addition");
-	matrix_sum<T, H, W> result(std::move(left));
-	result.add(right);
-	return result;
-}*/
 
 /*#####################################################################################*/
 									/*MATRIX PRODUCT*/

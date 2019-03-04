@@ -115,7 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="example4.cc" />
+    <ClCompile Include="main.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="iterators.h" />
